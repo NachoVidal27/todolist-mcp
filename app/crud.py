@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
-from models import TodoItemDB, TodoItemCreate, TodoItemUpdate
+from app.models import TodoItemDB  # Modelo SQLAlchemy de la tabla
+from app.models import TodoItemCreate, TodoItemUpdate  # Pydantic schemas en models.py 
+
 
 def get_items(db: Session):
     return db.query(TodoItemDB).all()

@@ -1,7 +1,7 @@
-from pydantic import BaseModel
-from typing import Optional
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base
+from typing import Optional
+from pydantic import BaseModel
+from app.database import Base  # Importamos Base único desde database.py
 
 # Modelos Pydantic (schemas)
 
@@ -29,7 +29,6 @@ class PromptRequest(BaseModel):
 
 class ClaudeResponse(BaseModel):
     response: str
-
 
 # Modelo SQLAlchemy (ORM)
 

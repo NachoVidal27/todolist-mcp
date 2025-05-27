@@ -1,3 +1,4 @@
+# app/api.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -7,16 +8,13 @@ from app.models import TodoItem, TodoItemCreate, TodoItemUpdate
 
 router = APIRouter()
 
-
 @router.get("/items/", response_model=List[TodoItem])
 def read_items(db: Session = Depends(get_db)):
     return get_items(db)
 
-
 @router.post("/items/", response_model=TodoItem)
 def create_new_item(item: TodoItemCreate, db: Session = Depends(get_db)):
     return create_item(db, item)
-
 
 @router.put("/items/{item_id}", response_model=TodoItem)
 def update_existing_item(item_id: int, item: TodoItemUpdate, db: Session = Depends(get_db)):
@@ -24,7 +22,6 @@ def update_existing_item(item_id: int, item: TodoItemUpdate, db: Session = Depen
     if not updated:
         raise HTTPException(status_code=404, detail="Item not found")
     return updated
-
 
 @router.delete("/items/{item_id}")
 def delete_existing_item(item_id: int, db: Session = Depends(get_db)):
