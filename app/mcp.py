@@ -69,9 +69,14 @@ def update_todo_item(
         raise HTTPException(status_code=404, detail="Item not found")
     return updated
 
-@router.post("/delete_todo_item")
-def delete_todo_item(item_id: int, db: Session = Depends(get_db)):
+
+@router.post("/delete_todo_item/{item_id}")
+def delete_todo_item(
+    item_id: int = Path(..., description="ID del ítem a eliminar"),
+    db: Session = Depends(get_db)
+):
     deleted = delete_item(db, item_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Item deleted"}
+
