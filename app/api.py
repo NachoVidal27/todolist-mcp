@@ -1,4 +1,3 @@
-# app/api.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
@@ -7,6 +6,8 @@ from app.crud import get_items, create_item, update_item, delete_item
 from app.models import TodoItem, TodoItemCreate, TodoItemUpdate
 
 router = APIRouter()
+
+##Items
 
 @router.get("/items/", response_model=List[TodoItem])
 def read_items(db: Session = Depends(get_db)):
@@ -29,3 +30,27 @@ def delete_existing_item(item_id: int, db: Session = Depends(get_db)):
     if not deleted:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Item deleted"}
+
+
+## Listas
+@router.post("/listas/", response_model=Lista)
+def create_new_list(lista: ListaCreate, db: Session = Depends(get_db)):
+    return create_list(db, lista)
+
+@router.get("/listas/", response_model=List[Lista])
+def read_lists(db: Session = Depends(get_db)):
+    return get_lists(db)
+
+@router.put("/listas/{lista_id}", response_model=Lista)
+def update_existing_list(lista_id: int, lista: ListaUpdate, db: Session = Depends(get_db)):
+    updated = update_list(db, lista_id, lista)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Lista not found")
+    return updated
+
+@router.delete("/listas/{lista_id}")
+def delete_existing_list(lista_id: int, db: Session = Depends(get_db)):
+    deleted = delete_list(db, lista_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Lista not found")
+    return {"message": "Lista deleted"}   

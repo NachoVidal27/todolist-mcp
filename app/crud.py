@@ -1,43 +1,79 @@
 from sqlalchemy.orm import Session
-from app.models import TodoItemDB  # Modelo SQLAlchemy de la tabla
-from app.models import TodoItemCreate, TodoItemUpdate  # Pydantic schemas en models.py 
+from app.models import (
+    TodoItemORM, TodoItemCreate, TodoItemUpdate,
+    ListaORM, ListaCreate, ListaUpdate
+)
+
+#TodoItem
 
 
 def get_items(db: Session):
-    return db.query(TodoItemDB).all()
+    return db.query(TodoItemORM).all()
 
-def get_item(db: Session, item_id: int):
-    return db.query(TodoItemDB).filter(TodoItemDB.id == item_id).first()
-
-def create_item(db: Session, item_create: TodoItemCreate):
-    db_item = TodoItemDB(
-        description=item_create.description,
-        list_id=item_create.list_id,
-        completed=item_create.completed,
+def create_item(db: Session, item: TodoItemCreate):
+    db_item = TodoItemORM(
+        descripcion=item.description,
+        completado=item.completed,
+        lista_id=item.list_id
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
 
-def update_item(db: Session, item_id: int, item_update: TodoItemUpdate):
-    db_item = db.query(TodoItemDB).filter(TodoItemDB.id == item_id).first()
+def update_item(db: Session, item_id: int, item: TodoItemUpdate):
+    db_item = db.query(TodoItemORM).filter(TodoItemORM.id == item_id).first()
     if not db_item:
         return None
-    if item_update.description is not None:
-        db_item.description = item_update.description
-    if item_update.completed is not None:
-        db_item.completed = item_update.completed
-    if item_update.list_id is not None:
-        db_item.list_id = item_update.list_id
+    if item.description is not None:
+        db_item.descripcion = item.description
+    if item.completed is not None:
+        db_item.completado = item.completed
+    if item.list_id is not None:
+        db_item.lista_id = item.list_id
     db.commit()
     db.refresh(db_item)
     return db_item
 
 def delete_item(db: Session, item_id: int):
-    db_item = db.query(TodoItemDB).filter(TodoItemDB.id == item_id).first()
+    db_item = db.query(TodoItemORM).filter(TodoItemORM.id == item_id).first()
     if not db_item:
-        return None
+        return False
     db.delete(db_item)
     db.commit()
-    return db_item
+    return True
+
+
+#Lista
+
+
+def create_lista(db: Session, lista: ListaCreate):
+    db_lista = ListaORM(nombre=lista.nombre)
+    db.add(db_lista)
+    db.commit()
+    db.refresh(db_lista)
+    return db_lista
+
+def get_listas(db: Session):
+    return db.query(ListaORM).all()
+
+def get_lista_by_id(db: Session, lista_id: int):
+    return db.query(ListaORM).filter(ListaORM.id == lista_id).first()
+
+def update_lista(db: Session, lista_id: int, update_data: ListaUpdate):
+    db_lista = db.query(ListaORM).filter(ListaORM.id == lista_id).first()
+    if not db_lista:
+        return None
+    if update_data.nombre is not None:
+        db_lista.nombre = update_data.nombre
+    db.commit()
+    db.refresh(db_lista)
+    return db_lista
+
+def delete_lista(db: Session, lista_id: int):
+    db_lista = db.query(ListaORM).filter(ListaORM.id == lista_id).first()
+    if not db_lista:
+        return False
+    db.delete(db_lista)
+    db.commit()
+    return True
