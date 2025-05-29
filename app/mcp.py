@@ -1,5 +1,4 @@
 import os
-import httpx
 from fastapi import APIRouter, Depends, HTTPException,Path, Body
 from sqlalchemy.orm import Session
 from typing import Optional
@@ -55,7 +54,7 @@ def get_manifest():
     }
     
 @router.post("/claude/prompt", response_model=ClaudeResponse)
-async def claude_prompt(data: PromptRequest):
+def claude_prompt(data: PromptRequest):
     api_key = os.getenv("CLAUDE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=500, detail="API key for Claude not configured")
@@ -66,21 +65,23 @@ async def claude_prompt(data: PromptRequest):
         "x-api-key": api_key,
         "Content-Type": "application/json"
     }
-    
+
     payload = {
         "model": "claude-v1",
         "prompt": data.prompt,
         "max_tokens_to_sample": 1000,
         "stop_sequences": ["\n\nHuman:"]
     }
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.post(url, json=payload, headers=headers)
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
         response.raise_for_status()
         completion = response.json()
-    
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Request to Claude failed: {str(e)}")
+
     text_response = completion.get("completion", "")
-    
+
     return ClaudeResponse(response=text_response)
 
 @router.post("/create_todo_item")
