@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException,Path, Body
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.crud import create_item, update_item, delete_item
-from app.models import TodoItemCreate, TodoItemUpdate
+from app.models import TodoItemCreate, TodoItemUpdate, PromptRequest, ClaudeResponse
 from app.database import get_db
+import os
 
 router = APIRouter()
 
@@ -51,6 +52,35 @@ def get_manifest():
             }
         ]
     }
+    
+@router.post("/claude/prompt", response_model=ClaudeResponse)
+async def claude_prompt(data: PromptRequest):
+    api_key = os.getenv("CLAUDE_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="API key for Claude not configured")
+
+    url = "https://api.anthropic.com/v1/complete"
+
+    headers = {
+        "x-api-key": api_key,
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": "claude-v1",
+        "prompt": data.prompt,
+        "max_tokens_to_sample": 1000,
+        "stop_sequences": ["\n\nHuman:"]
+    }
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        completion = response.json()
+    
+    text_response = completion.get("completion", "")
+    
+    return ClaudeResponse(response=text_response)
 
 @router.post("/create_todo_item")
 def create_todo_item(data: TodoItemCreate, db: Session = Depends(get_db)):
@@ -79,4 +109,6 @@ def delete_todo_item(
     if not deleted:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Item deleted"}
+
+
 
