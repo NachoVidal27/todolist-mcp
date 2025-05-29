@@ -3,5 +3,5 @@ uvicorn[standard]
 sqlalchemy
 databases
 pydantic
-httpx
+requests
 psycopg2-binary

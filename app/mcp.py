@@ -5,6 +5,7 @@ from typing import Optional
 from app.crud import create_item, update_item, delete_item
 from app.models import TodoItemCreate, TodoItemUpdate, PromptRequest, ClaudeResponse
 from app.database import get_db
+import requests
 
 router = APIRouter()
 
