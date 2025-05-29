@@ -1,23 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List as ListType
 from app.database import get_db
 from app.crud import (
     get_items, create_item, update_item, delete_item,
     complete_item, create_item_in_list,
-    get_listas, create_lista, update_lista, delete_lista
+    get_lists, create_list, update_list, delete_list
 )
 from app.models import (
     TodoItem, TodoItemCreate, TodoItemUpdate,
-    Lista, ListaCreate, ListaUpdate
+    List, ListCreate, ListUpdate, ListORM
 )
+
 router = APIRouter()
 
 ##Items
 
-@router.get("/items/", response_model=List[TodoItem])
+@router.get("/items/", response_model=ListType[TodoItem])
 def read_items(db: Session = Depends(get_db)):
     return get_items(db)
+
 
 @router.post("/items/", response_model=TodoItem)
 def create_new_item(item: TodoItemCreate, db: Session = Depends(get_db)):
@@ -25,10 +27,10 @@ def create_new_item(item: TodoItemCreate, db: Session = Depends(get_db)):
 
 @router.post("/lists/{list_id}/items", response_model=TodoItem)
 def create_item_in_specific_list(list_id: int, item: TodoItemCreate, db: Session = Depends(get_db)):
-    # Verificar que la lista existe
-    lista = db.query(Lista).filter(Lista.id == list_id).first()
+    # Verificar que la lista existe usando el modelo ORM
+    lista = db.query(ListORM).filter(ListORM.id == list_id).first()
     if not lista:
-        raise HTTPException(status_code=404, detail="Lista not found")
+        raise HTTPException(status_code=404, detail="List not found")
     
     return create_item_in_list(db, list_id, item)   
 
@@ -54,25 +56,27 @@ def delete_existing_item(item_id: int, db: Session = Depends(get_db)):
     return {"message": "Item deleted"}
 
 
-## Listas
-@router.post("/listas/", response_model=Lista)
-def create_new_list(lista: ListaCreate, db: Session = Depends(get_db)):
-    return create_lista(db, lista)
+## Lists
+@router.post("/lists/", response_model=List)
+def create_new_list(lista: ListCreate, db: Session = Depends(get_db)):
+    return create_list(db, lista)
 
-@router.get("/listas/", response_model=List[Lista])
+@router.get("/lists/", response_model=ListType[List])
 def read_lists(db: Session = Depends(get_db)):
-    return get_listas(db)
+    return get_lists(db)
 
-@router.put("/listas/{lista_id}", response_model=Lista)
-def update_existing_list(lista_id: int, lista: ListaUpdate, db: Session = Depends(get_db)):
-    updated = update_lista(db, lista_id, lista)
+
+
+@router.put("/lists/{list_id}", response_model=List)
+def update_existing_list(list_id: int, lista: ListUpdate, db: Session = Depends(get_db)):
+    updated = update_list(db, list_id, lista)
     if not updated:
-        raise HTTPException(status_code=404, detail="Lista not found")
+        raise HTTPException(status_code=404, detail="List not found")
     return updated
 
-@router.delete("/listas/{lista_id}")
-def delete_existing_list(lista_id: int, db: Session = Depends(get_db)):
-    deleted = delete_lista(db, lista_id)
+@router.delete("/lists/{list_id}")
+def delete_existing_list(list_id: int, db: Session = Depends(get_db)):
+    deleted = delete_list(db, list_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Lista not found")
-    return {"message": "Lista deleted"}
+        raise HTTPException(status_code=404, detail="List not found")
+    return {"message": "List deleted"}

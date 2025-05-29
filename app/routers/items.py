@@ -10,6 +10,14 @@ router = APIRouter(prefix="/items")
 @router.get("/", response_model=List[TodoItem])
 def read_items(db: Session = Depends(get_db)):
     return get_items(db)
+  
+@router.get("/{item_id}", response_model=TodoItem)
+def read_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(TodoItemORM).filter(TodoItemORM.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return item
+
 
 @router.post("/", response_model=TodoItem)
 def create_new_item(item: TodoItemCreate, db: Session = Depends(get_db)):

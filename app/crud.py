@@ -20,6 +20,18 @@ def create_item(db: Session, item: TodoItemCreate):
     db.refresh(db_item)
     return db_item
 
+# NUEVA: Crear ítem en una lista específica
+def create_item_in_list(db: Session, list_id: int, item: TodoItemCreate):
+    db_item = TodoItemORM(
+        description=item.description,
+        completed=item.completed if item.completed is not None else False,
+        list_id=list_id  # Forzamos el list_id del parámetro
+    )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
 def update_item(db: Session, item_id: int, item: TodoItemUpdate):
     db_item = db.query(TodoItemORM).filter(TodoItemORM.id == item_id).first()
     if not db_item:
@@ -30,6 +42,16 @@ def update_item(db: Session, item_id: int, item: TodoItemUpdate):
         db_item.completed = item.completed
     if item.list_id is not None:
         db_item.list_id = item.list_id
+    db.commit()
+    db.refresh(db_item)
+    return db_item
+
+# NUEVA: Completar un ítem (marcar como terminado)
+def complete_item(db: Session, item_id: int):
+    db_item = db.query(TodoItemORM).filter(TodoItemORM.id == item_id).first()
+    if not db_item:
+        return None
+    db_item.completed = True
     db.commit()
     db.refresh(db_item)
     return db_item

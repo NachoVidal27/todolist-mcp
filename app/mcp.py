@@ -56,7 +56,7 @@ def get_manifest():
 def create_todo_item(data: TodoItemCreate, db: Session = Depends(get_db)):
     return create_item(db, data)
 
-@router.post("/update_todo_item/{item_id}")
+@router.put("/update_todo_item/{item_id}")
 def update_todo_item(
     item_id: int = Path(..., description="ID del ítem a actualizar"),
     item_update: TodoItemUpdate = Body(...),
