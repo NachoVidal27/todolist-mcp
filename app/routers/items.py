@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.database import get_db
 from app.crud import get_items, create_item, update_item, delete_item
-from app.models import TodoItem, TodoItemCreate, TodoItemUpdate
+from app.models import TodoItem, TodoItemCreate, TodoItemUpdate, TodoItemORM
+
 
 router = APIRouter(prefix="/items")
 
