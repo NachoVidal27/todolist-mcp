@@ -60,7 +60,7 @@ def claude_prompt(data: PromptRequest):
     if not api_key:
         raise HTTPException(status_code=500, detail="API key for Claude not configured")
 
-    url = "https://api.anthropic.com/v1/complete"
+    url = "https://api.anthropic.com/v1/messages"
 
     headers = {
         "x-api-key": api_key,
