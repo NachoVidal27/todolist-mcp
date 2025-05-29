@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.routes import items, lists
+from app.routers import items, lists
 
 router = APIRouter()
 router.include_router(items.router, prefix="/items", tags=["items"])
