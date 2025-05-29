@@ -54,7 +54,7 @@ def get_manifest():
         ]
     }
     
-import requests  # Asegúrate de que esté importado al inicio del archivo
+
 
 @router.post("/claude/prompt", response_model=ClaudeResponse)
 def claude_prompt(data: PromptRequest):

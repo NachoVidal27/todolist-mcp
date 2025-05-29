@@ -5,3 +5,4 @@ databases
 pydantic
 requests
 psycopg2-binary
+fastapi-mcp
