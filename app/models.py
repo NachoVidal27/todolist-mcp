@@ -2,46 +2,45 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from typing import Optional
 from pydantic import BaseModel
-from app.database import Base  
+from app.database import Base
 
-# modelos orm sqlalchemy
+# SQLAlchemy ORM models
 
-
-class ListaORM(Base):
-    __tablename__ = "listas"
+class ListORM(Base):
+    __tablename__ = "lists"
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String, unique=True, index=True, nullable=False)
 
-    items = relationship("TodoItemORM", back_populates="lista", cascade="all, delete-orphan")
+    items = relationship("TodoItemORM", back_populates="list", cascade="all, delete-orphan")
 
 
 class TodoItemORM(Base):
     __tablename__ = "todoitems"
     id = Column(Integer, primary_key=True, index=True)
-    descripcion = Column(String, index=True)
-    completado = Column(Boolean, default=False)
-    lista_id = Column(Integer, ForeignKey("listas.id"))
+    description = Column(String, index=True)
+    completed = Column(Boolean, default=False)
+    list_id = Column(Integer, ForeignKey("lists.id"))
 
-    lista = relationship("ListaORM", back_populates="items")
+    list = relationship("ListORM", back_populates="items")
 
 
+# Pydantic models
 
-# Modelos Pydantic (Schemas)
+class ListBase(BaseModel):
+    name: str
 
-class ListaBase(BaseModel):
-    nombre: str
-
-class ListaCreate(ListaBase):
+class ListCreate(ListBase):
     pass
 
-class ListaUpdate(BaseModel):
-    nombre: Optional[str] = None
+class ListUpdate(BaseModel):
+    name: Optional[str] = None
 
-class Lista(ListaBase):
+class List(ListBase):
     id: int
 
     class Config:
         orm_mode = True
+
 
 class TodoItemBase(BaseModel):
     description: str
@@ -63,9 +62,7 @@ class TodoItem(TodoItemBase):
         orm_mode = True
 
 
-
-# modelos Claude
-
+# Claude prompt models 
 
 class PromptRequest(BaseModel):
     prompt: str
