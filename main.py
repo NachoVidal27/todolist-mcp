@@ -3,6 +3,10 @@ from app.routers import router as api_router
 from app.mcp import router as mcp_router
 from app.models import Base
 from app.database import engine
+from dotenv import load_dotenv
+
+
+load_dotenv() 
 
 app = FastAPI(title="TodoList API with MCP Server")
 

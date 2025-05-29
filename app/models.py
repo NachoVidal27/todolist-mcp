@@ -17,7 +17,7 @@ class ListORM(Base):
 class TodoItemORM(Base):
     __tablename__ = "todoitems"
     id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, index=True)
+    description = Column(String, index=True, nullable=False)
     completed = Column(Boolean, default=False)
     list_id = Column(Integer, ForeignKey("lists.id"))
 
