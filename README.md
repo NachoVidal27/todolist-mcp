@@ -57,7 +57,7 @@ Estructura típica del proyecto:
 Notas:
 
 - Asegúrate de tener fastapi-mcp instalado en tu entorno Python.
-- Puedes verificar las herramientas MCP accediendo a http://localhost:8000/mcp/status
+- Puedes verificar las herramientas MCP accediendo a http://localhost:8000/mcp
 - Usa Postman o curl para probar los endpoints REST de forma manual.
 
 Autor: Ignacio Vidal
